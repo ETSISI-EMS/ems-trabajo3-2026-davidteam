@@ -58,45 +58,61 @@ public class ContactosCovid {
 		this.listaContactos = listaContactos;
 	}
 
-	public void loadData(String data, boolean reset) throws EmsInvalidTypeException, EmsInvalidNumberOfDataException,
-			EmsDuplicatePersonException, EmsDuplicateLocationException {
-		// borro información anterior
-		if (reset) {
-			this.poblacion = new Poblacion();
-			this.localizacion = new Localizacion();
-			this.listaContactos = new ListaContactos();
-		}
-		String datas[] = dividirEntrada(data);
-		for (String linea : datas) {
-			String datos[] = this.dividirLineaData(linea);
-			if (!datos[0].equals("PERSONA") && !datos[0].equals("LOCALIZACION")) {
-				throw new EmsInvalidTypeException();
-			}
-			if (datos[0].equals("PERSONA")) {
-				if (datos.length != Constantes.MAX_DATOS_PERSONA) {
-					throw new EmsInvalidNumberOfDataException("El número de datos para PERSONA es menor de 8");
-				}
-				this.poblacion.addPersona(this.crearPersona(datos));
-			}
-			if (datos[0].equals("LOCALIZACION")) {
-				if (datos.length != Constantes.MAX_DATOS_LOCALIZACION) {
-					throw new EmsInvalidNumberOfDataException("El número de datos para LOCALIZACION es menor de 6");
-				}
-				PosicionPersona pp = this.crearPosicionPersona(datos);
-				this.localizacion.addLocalizacion(pp);
-				this.listaContactos.insertarNodoTemporal(pp);
-			}
-		}
-	}
+    public void loadData(String data, boolean reset) throws EmsInvalidTypeException,
+            EmsInvalidNumberOfDataException, EmsDuplicatePersonException, EmsDuplicateLocationException {
+        if (reset) resetData();
+        processLines(dividirEntrada(data));
+    }
 
-	public void loadDataFile(String fichero, boolean reset) {
-		File archivo = null;
-		FileReader fr = null;
-		BufferedReader br = null;
-		String datas[] = null, data = null;
-		loadDataFile(fichero, reset, archivo, fr, br, datas, data);
-		
-	}
+    public void loadDataFile(String fichero, boolean reset) {
+        if (reset) resetData();
+        try (BufferedReader br = new BufferedReader(new FileReader(fichero))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                processLines(dividirEntrada(line.trim()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void processLines(String[] lines) throws EmsInvalidTypeException,
+            EmsInvalidNumberOfDataException, EmsDuplicatePersonException, EmsDuplicateLocationException {
+        for (String linea : lines) {
+            String[] datos = dividirLineaData(linea);
+            String tipo = datos[0];
+
+            if (tipo.equals("PERSONA")) {
+                validarYAgregarPersona(datos);
+            } else if (tipo.equals("LOCALIZACION")) {
+                validarYAgregarLocalizacion(datos);
+            } else {
+                throw new EmsInvalidTypeException();
+            }
+        }
+    }
+
+    private void resetData() {
+        this.poblacion = new Poblacion();
+        this.localizacion = new Localizacion();
+        this.listaContactos = new ListaContactos();
+    }
+
+    private void validarYAgregarPersona(String[] datos) throws EmsInvalidNumberOfDataException, EmsDuplicatePersonException {
+        if (datos.length != Constantes.MAX_DATOS_PERSONA) {
+            throw new EmsInvalidNumberOfDataException("El número de datos para PERSONA es incorrecto");
+        }
+        this.poblacion.addPersona(crearPersona(datos));
+    }
+
+    private void validarYAgregarLocalizacion(String[] datos) throws EmsInvalidNumberOfDataException, EmsDuplicateLocationException {
+        if (datos.length != Constantes.MAX_DATOS_LOCALIZACION) {
+            throw new EmsInvalidNumberOfDataException("El número de datos para LOCALIZACION es incorrecto");
+        }
+        PosicionPersona pp = crearPosicionPersona(datos);
+        this.localizacion.addLocalizacion(pp);
+        this.listaContactos.insertarNodoTemporal(pp);
+    }
 
 	@SuppressWarnings("resource")
 	public void loadDataFile(String fichero, boolean reset, File archivo, FileReader fr, BufferedReader br, String datas[], String data ) {
