@@ -1,4 +1,6 @@
-:point_right: PUT YOUR CI BADGE HERE
+[![Build](https://github.com/ETSISI-EMS/ems-trabajo3-2026-davidteam/actions/workflows/main.yml/badge.svg)](https://github.com/ETSISI-EMS/ems-trabajo3-2026-davidteam/actions/workflows/main.yml)
+
+[![Quality Gate Status](https://c1.etsisi.upm.es:8888/api/project_badges/measure?project=ETSISI-EMS_ems-trabajo3-2026-davidteam_e20928b0-9966-4bd3-b043-29fc6cd60dbf&metric=alert_status&token=sqb_d66301370f617e94ccb450c121daf8c9a19ab467)](https://c1.etsisi.upm.es:8888/dashboard?id=ETSISI-EMS_ems-trabajo3-2026-davidteam_e20928b0-9966-4bd3-b043-29fc6cd60dbf)
 
 # EMS-lab3 Maintainability
 
